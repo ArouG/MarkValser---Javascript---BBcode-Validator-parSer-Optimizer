@@ -1,6 +1,7 @@
 /*jshint maxcomplexity:50 */
 /*global module, define */
 /*Version V 1.2 - factorisation de code : node_clone*/
+/*Version V 1.3 - validation IE < Edge : function.name, new RegExp(nreg, 'gi') --> new RegExp(nreg.source, 'gi') */
 
 var MarkValser = (function () {
     "use strict";
@@ -15,6 +16,7 @@ var MarkValser = (function () {
         REparext = /\$E/g,
         REanything = /(.*)/i,
         REmetacar = /[\!|\^|\$|\(|\)|\[|\]|\{|\}|\?|\+|\*|\.|\/|\\|\|]/g,
+        REfunc = /^function\s+([\w\$]+)\s*/,
         REurlStr = /(^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?))/i,
 
                                       // OUTPUTS :
@@ -199,14 +201,23 @@ var MarkValser = (function () {
     // verification existence of fonctions "trad" and "filter"
     function verification_functions(BBC_Def, afunctions) {
         var filter,
+            match,
             lng;        
         // initialization of namefunctions witch is global !
+        // Be careful : function.name isn't known for IE < Edge (or 12)
         namefunctions = [];
         lng = afunctions.length;
         for (t = 0; t < lng; t += 1) {
+            //console.log(afunctions[t].toString());
+            match = REfunc.exec(afunctions[t].toString());
+            if (match !== null){
+                namefunctions.push(match[1]);    
+            }
+            /*
             if (afunctions[t].name !== undefined) {
                 namefunctions.push(afunctions[t].name);
             }
+            */
         }
         lng = BBC_Def.length;        
         for (t = 0; t < lng; t += 1) {
@@ -500,7 +511,8 @@ var MarkValser = (function () {
             // FIRST improvement : detect forgotten tags because of case sensitive !!
             if (!nreg[1]) {
                 stmpmatch = [];
-                newregopening = new RegExp(nreg, 'gi');
+                //newregopening = new RegExp(nreg, 'gi');
+                newregopening = new RegExp(nreg.source, 'gi');
                 while ((match = newregopening.exec(BBtext_before)) !== null) {
                     match.input = t;
                     match.absorbed = false;
@@ -530,7 +542,8 @@ var MarkValser = (function () {
 
                 if (!nreg[1]) {                                                // and closing 'sensitive' !!
                     stmpmatch = [];
-                    newregopening = new RegExp(nreg, 'gi');
+                    //newregopening = new RegExp(nreg, 'gi');
+                    newregopening = new RegExp(nreg.source, 'gi');
                     while ((match = newregopening.exec(BBtext_before)) !== null) {
                         match.input = t;
                         match.absorbed = false;
@@ -543,7 +556,8 @@ var MarkValser = (function () {
                 }
 
                 // save them in  arrtBBanticlosing AND in  arrtBB   &&  try to inverse '/' <=> '\'                                                                             
-                var str_regclosing = regle.regclosing.toString().replace('\\\/','\\\\');
+                var str_regclosing = regle.regclosing.toString().replace('\\\/','\\\\');                                                                         
+                //var str_regclosing = regle.regclosing.toString().replace('\\\/','\\\\');
                 str_regclosing = str_regclosing.substr(1, str_regclosing.lastIndexOf('/') - 1);
                 nreg = new RegExp(str_regclosing,'g');
                 tmpmatchs=[];
@@ -565,7 +579,7 @@ var MarkValser = (function () {
                 // save them in arrtBBanticlosing, in arrtBBsensitive AND in arrtBB 
                 if (!regle.closing[1]){
                     stmpmatch = [];
-                    newregi = new RegExp(str_regclosing,'gi');
+                    newregi = new RegExp(str_regclosing, 'gi');
                     while ((match = newregi.exec(BBtext_before)) !== null){
                         match.input=t;
                         match.absorbed = false;
