@@ -511,7 +511,6 @@ var MarkValser = (function () {
             // FIRST improvement : detect forgotten tags because of case sensitive !!
             if (!nreg[1]) {
                 stmpmatch = [];
-                //newregopening = new RegExp(nreg, 'gi');
                 newregopening = new RegExp(nreg.source, 'gi');
                 while ((match = newregopening.exec(BBtext_before)) !== null) {
                     match.input = t;
@@ -542,8 +541,7 @@ var MarkValser = (function () {
 
                 if (!nreg[1]) {                                                // and closing 'sensitive' !!
                     stmpmatch = [];
-                    //newregopening = new RegExp(nreg, 'gi');
-                    newregopening = new RegExp(nreg.source, 'gi');
+                    newregopening = new RegExp(nreg.source,'gi');
                     while ((match = newregopening.exec(BBtext_before)) !== null) {
                         match.input = t;
                         match.absorbed = false;
@@ -556,8 +554,7 @@ var MarkValser = (function () {
                 }
 
                 // save them in  arrtBBanticlosing AND in  arrtBB   &&  try to inverse '/' <=> '\'                                                                             
-                var str_regclosing = regle.regclosing.toString().replace('\\\/','\\\\');                                                                         
-                //var str_regclosing = regle.regclosing.toString().replace('\\\/','\\\\');
+                var str_regclosing = regle.regclosing.toString().replace('\\\/','\\\\');        
                 str_regclosing = str_regclosing.substr(1, str_regclosing.lastIndexOf('/') - 1);
                 nreg = new RegExp(str_regclosing,'g');
                 tmpmatchs=[];
